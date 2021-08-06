@@ -1,4 +1,6 @@
-package com.itheima.test;
+package com.baiye.test;
+
+import java.time.LocalDateTime;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,5 +15,6 @@ public class Test {
         String sql = "insert into user(username,birthday,sex,address) values(#{username},#{birthday},#{sex},#{address})";
         String replace = sql.replace("#{" + "username" + "}", "\"" + o + "" + "\"");
         System.out.println(replace);
+        System.out.println( LocalDateTime.now());
     }
 }
