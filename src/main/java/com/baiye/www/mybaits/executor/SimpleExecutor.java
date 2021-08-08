@@ -1,7 +1,10 @@
 package com.baiye.www.mybaits.executor;
 
+import com.baiye.www.exceptions.MybatisException;
 import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.confiuration.Mapper;
+import com.baiye.www.utils.StringUtil;
+
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -62,18 +65,18 @@ public class SimpleExecutor implements Executor{
                 ResultSetMetaData metaData = resultSet.getMetaData();
                 for(int i=1;i<=metaData.getColumnCount();i++){
                     String columnName = metaData.getColumnName(i);
+                    columnName = StringUtil.underlineToHump(columnName);
                     Object value = resultSet.getObject(columnName);
                     PropertyDescriptor propertyDescriptor = new PropertyDescriptor(columnName, pojoClass);
                     Method writeMethod = propertyDescriptor.getWriteMethod();
                     writeMethod.invoke(pojo,value);
-
                 }
                 list.add(pojo);
             }
             return list;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException();
+            throw new MybatisException("query时sql执行或注入实体类错误",e);
+
         }finally {
             release(preparedStatement,resultSet);
         }
@@ -130,18 +133,11 @@ public class SimpleExecutor implements Executor{
 
             }
 
-
-
-
-
-
             resultInt= preparedStatement.executeUpdate();
-
 
             return resultInt;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException();
+            throw new MybatisException("update时sql执行或注入实体类错误",e);
         }finally {
             release(preparedStatement,null);
         }
@@ -152,7 +148,7 @@ public class SimpleExecutor implements Executor{
             try {
                 rs.close();
             }catch(Exception e){
-                e.printStackTrace();
+                throw new MybatisException("资源释放异常",e);
             }
         }
 
@@ -160,7 +156,7 @@ public class SimpleExecutor implements Executor{
             try {
                 pstm.close();
             }catch(Exception e){
-                e.printStackTrace();
+                throw new MybatisException("资源释放异常",e);
             }
         }
     }
