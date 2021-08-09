@@ -46,7 +46,7 @@ public class DefaultSqlSession implements SqlSession {
 
 
     @Override
-    public <T> T selectOne(String mapperName, Object parameter) {
+    public <T> T selectOne(String mapperName, Object[] parameter) {
         List<T> selectList = this.selectList(mapperName,parameter);
         if(selectList == null || selectList.size() == 0){
             return null;
@@ -59,22 +59,23 @@ public class DefaultSqlSession implements SqlSession {
     }
 
     @Override
-    public <T> List<T> selectList(String mapperName, Object parameter) {
+    public <T> List<T> selectList(String mapperName, Object[] parameter) {
+        System.out.println(parameter);
         return executor.query(configuration.getMappers().get(mapperName),parameter);
     }
 
     @Override
-    public int insert(String mapperName, Object parameter) {
+    public int insert(String mapperName, Object[] parameter) {
         return executor.update(configuration.getMappers().get(mapperName),parameter);
     }
 
     @Override
-    public int update(String mapperName, Object parameter) {
+    public int update(String mapperName, Object[] parameter) {
         return executor.update(configuration.getMappers().get(mapperName),parameter);
     }
 
     @Override
-    public int delete(String mapperName, Object parameter) {
+    public int delete(String mapperName, Object[] parameter) {
         return executor.update(configuration.getMappers().get(mapperName),parameter);
     }
 

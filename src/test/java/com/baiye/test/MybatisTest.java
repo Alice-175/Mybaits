@@ -11,6 +11,10 @@ import com.baiye.www.utils.SessionUtil;
 
 import java.io.InputStream;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.List;
+
 
 public class MybatisTest {
 
@@ -23,12 +27,16 @@ public class MybatisTest {
         //4.使用SqlSession创建Dao接口的代理对象
         IUserDao userDao = session.getMapper(IUserDao.class);
         //5.使用代理对象执行方法
- //       List<User> users = userDao.findAll();
-        User user = userDao.findById("41");
-        //userDao.insertUser(new User(1,"小花",new Date(1920,11,23),"男","江西"));
+      //  List<User> user = userDao.findAll();
+       // User user = userDao.findById("41");
+  //      List<User> user = userDao.findSome("%王%","男");
+   //     userDao.insertUser(new User(101,"小花",new Date(1920,11,23),"男","江西"));
 //        userDao.deletebyId("49");
- //       userDao.update(new User(42,"小花",new Date(1920,11,23),"男","江西"));
-        System.out.println(user);
+        long time = System.currentTimeMillis();
+        java.sql.Date date = new java.sql.Date(time);
+        java.sql.Timestamp timestamp = new Timestamp(time);
+        userDao.update(new User(42,"小花ss",timestamp,"女","江西"));
+       // System.out.println(user);
 //        for(User u : users){
 //            System.out.println(u);
 //        }

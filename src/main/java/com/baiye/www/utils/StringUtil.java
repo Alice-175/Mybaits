@@ -39,4 +39,9 @@ public class StringUtil {
         return str;
     }
 
+    public static int getTargetStringNum(String str,String  character){
+        String temp = str.replace(character,"");
+        return str.length()-temp.length();
+    }
+
 }

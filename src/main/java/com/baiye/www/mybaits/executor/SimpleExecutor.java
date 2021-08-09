@@ -3,10 +3,15 @@ package com.baiye.www.mybaits.executor;
 import com.baiye.www.exceptions.MybatisException;
 import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.confiuration.Mapper;
+import com.baiye.www.utils.SqlUtil;
 import com.baiye.www.utils.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,45 +25,31 @@ import java.util.List;
  * @Description:
  */
 public class SimpleExecutor implements Executor{
+    Logger logger = LoggerFactory.getLogger(SqlUtil.class);
+
     private final Configuration configuration;
 
     public SimpleExecutor(Configuration configuration) {
         this.configuration = configuration;
     }
     @Override
-    public <E> List<E> query(Mapper mapper,Object object) {
+    public <E> List<E> query(Mapper mapper,Object[] object) {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        String tempSql = mapper.getSql();
+        String originalSql = mapper.getSql();
         String resultType = mapper.getResultType();
         String parameterType = mapper.getParameterType();
-        //没有参数
-        String  sql = null;
+
+        String resultSql = null;
+        Connection conn = null;
+        logger.info("originalSql = "+originalSql);
         try {
-        Connection conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
-
-        if(object == null){
-            sql = tempSql;
-            preparedStatement = conn.prepareStatement(sql);
-
-        }else {//只有一个参数,转化为字符串
-            //String param = objects[0]+"";
-            String regex = "#\\{([^}])*\\}";
-            // 将 sql 语句中的 #{userId} 替换为 ？
-            sql = tempSql.replaceAll(regex,"?");
-            preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setObject(1,object);
-            System.out.println(sql+object.toString());
-           // System.out.println(preparedStatement.get);
-        }
-
-
-
-
+            resultSql = SqlUtil.paramToSql(originalSql,object);
+            logger.info("resultSql = "+resultSql);
+            conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
+            preparedStatement = conn.prepareStatement(resultSql);
             Class pojoClass = Class.forName(resultType);
-
             resultSet = preparedStatement.executeQuery();
-
             List<E> list = new ArrayList<>();
             while (resultSet.next()){
                 E pojo = (E) pojoClass.newInstance();
@@ -74,9 +65,8 @@ public class SimpleExecutor implements Executor{
                 list.add(pojo);
             }
             return list;
-        } catch (Exception e) {
+        } catch (InvocationTargetException | IllegalAccessException | IntrospectionException | SQLException | InstantiationException | ClassNotFoundException e) {
             throw new MybatisException("query时sql执行或注入实体类错误",e);
-
         }finally {
             release(preparedStatement,resultSet);
         }
@@ -90,53 +80,21 @@ public class SimpleExecutor implements Executor{
     }
 
     @Override
-    public int update(Mapper mapper, Object object) {
+    public int update(Mapper mapper, Object[] object) {
         PreparedStatement preparedStatement = null;
-
+        //xml里的sql字符串
         String originalSql = mapper.getSql();
-        String realSql = null;
+        String resultSql = null;
         String parameterType = mapper.getParameterType();
-        //没有参数
-        String  sql = null;
-        String temp = originalSql.replace("#","");
-        int paramCount = originalSql.length()-temp.length();
-        int resultInt = -1;
+        Connection conn = null;
+        logger.info("originalSql = "+originalSql);
         try {
-            Connection conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
-
-            if(object == null){
-                realSql = originalSql;
-                preparedStatement = conn.prepareStatement(realSql);
-
-            }else if(paramCount == 1){//只有一个参数即只有一个基本数据类型,转化为字符串,若只有一个参数，则传基本类型，若有多个，封装成pojo
-                //String param = objects[0]+"";
-                String regex = "#\\{([^}])*\\}";
-                // 将 sql 语句中的 #{userId} 替换为 ？
-                realSql = originalSql.replaceAll(regex,"?");
-                preparedStatement = conn.prepareStatement(realSql);
-                preparedStatement.setObject(1,object);
-
-
-            }else{//实体类型参数
-                Class obj = object.getClass();
-                Field[] declaredFields = obj.getDeclaredFields();
-                for (Field field:declaredFields) {
-                    String fieldName = field.getName();
-                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(fieldName, obj);
-                    Method readMethod = propertyDescriptor.getReadMethod();
-                    Object o = readMethod.invoke(object);
-                    originalSql = originalSql.replace("#{"+fieldName+"}","\""+o+""+"\"");
-                }
-                realSql = originalSql;
-                System.out.println(realSql);
-                preparedStatement = conn.prepareStatement(realSql);
-
-            }
-
-            resultInt= preparedStatement.executeUpdate();
-
-            return resultInt;
-        } catch (Exception e) {
+            resultSql = SqlUtil.paramToSql(originalSql,object);
+            logger.info("resultSql = "+resultSql);
+            conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
+            preparedStatement = conn.prepareStatement(resultSql);
+            return preparedStatement.executeUpdate();
+        } catch (SQLException | IntrospectionException | IllegalAccessException | InvocationTargetException e) {
             throw new MybatisException("update时sql执行或注入实体类错误",e);
         }finally {
             release(preparedStatement,null);

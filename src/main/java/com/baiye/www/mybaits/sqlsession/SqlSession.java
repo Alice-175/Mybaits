@@ -14,11 +14,11 @@ import java.util.List;
 public interface SqlSession {
     <T> T getMapper(Class<T> daoInterfaceClass);
 
-    <T> T selectOne(String mapperName, Object parameter);
-    <T> List<T> selectList(String mapperName, Object parameter);
-    int insert(String mapperName,Object parameter);
-    int update(String mapperName,Object parameter);
-    int delete(String mapperName,Object parameter);
+    <T> T selectOne(String mapperName, Object[] parameter);
+    <T> List<T> selectList(String mapperName, Object[] parameter);
+    int insert(String mapperName,Object[] parameter);
+    int update(String mapperName,Object[] parameter);
+    int delete(String mapperName,Object[] parameter);
 
     void close();
 }

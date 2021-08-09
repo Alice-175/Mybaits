@@ -1,6 +1,7 @@
 package com.baiye.www.dao;
 
 import com.baiye.www.domain.User;
+import com.baiye.www.mybaits.annotation.Param;
 import com.baiye.www.mybaits.annotation.Select;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public interface IUserDao {
     List<User> findAll();
     @Select("select * from user where id=#{id}")
     User findById(String id);
+    List<User> findSome(@Param("username") String username,@Param("sex") String sex);
     void insertUser(User user);
 
     void deletebyId(String s);

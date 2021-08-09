@@ -12,9 +12,9 @@ import java.util.List;
  * @Description:
  */
 public interface Executor {
-    <E> List<E> query(Mapper mapper, Object parameter);
+    <E> List<E> query(Mapper mapper, Object[] parameter);
 
     void close();
 
-    int update(Mapper mapper, Object parameter);
+    int update(Mapper mapper, Object[] parameter);
 }
