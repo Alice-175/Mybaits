@@ -52,14 +52,6 @@ public class MapperProxy implements InvocationHandler {
         }else{
             return sqlSession.selectOne(method.getDeclaringClass().getName()+"."+method.getName(), args);
         }
-//        String className = method.getDeclaringClass().getName();
-//        String key = className+"."+method.getName();
-//        sqlSession.get
-//        Mapper mapper = mappers.get(key);
-//        if(mapper == null){
-//            throw new IllegalArgumentException("传入的参数有误");
-//        }
-//        //6.调用工具类执行查询所有
-//        return new SimpleExecutor().selectList(mapper,args);
+
     }
 }
