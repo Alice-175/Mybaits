@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author GUOZHIPENG
@@ -38,10 +39,12 @@ public class SqlUtil {
             return originalSql;
         } else { //多个参数，传的也是多个基本类型
             for (Object o : object) {
-                ArrayList list = (ArrayList) o;
-                String regex = "#\\{" + list.get(0) + "}";
-                //将 sql 语句中的 #{*} 替换为 ？
-                originalSql = originalSql.replaceAll(regex, "\"" + list.get(1) + "" + "\"");
+                HashMap<String, String> map = (HashMap<String, String>) o;
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    String regex = "#\\{" + entry.getKey() + "}";
+                    //将 sql 语句中的 #{*} 替换为 ？
+                    originalSql = originalSql.replaceAll(regex, "\"" + entry.getValue() + "" + "\"");
+                }
             }
             return originalSql;
         }

@@ -38,11 +38,10 @@ public class MapperProxy implements InvocationHandler {
         if(args != null&&args.length > 1){
             Annotation[][] annotation = method.getParameterAnnotations();
             for(int i = 0;i<args.length;i++){
-                List list = new ArrayList(2);
+                Map<String, String> map = new HashMap(1);
                 Param anno = (Param)annotation[i][0];
-                list.add(0, anno.value());
-                list.add(1,args[i]+"");
-                args[i] =list;
+                map.put(anno.value(),args[i]+"");
+                args[i] =map;
             }
         }
         if(Collection.class.isAssignableFrom(method.getReturnType())){

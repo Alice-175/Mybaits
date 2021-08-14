@@ -38,17 +38,17 @@ public class MybatisTest {
         //5.使用代理对象执行方法
       //  List<User> user = userDao.findAll();
        // User user = userDao.findById("41");
-  //      List<User> user = userDao.findSome("%王%","男");
+        List<User> user = userDao.findSome("%王%","男");
    //     userDao.insertUser(new User(101,"小花",new Date(1920,11,23),"男","江西"));
 //        userDao.deletebyId("49");
         long time = System.currentTimeMillis();
         java.sql.Date date = new java.sql.Date(time);
         java.sql.Timestamp timestamp = new Timestamp(time);
-        userDao.update(new User(42,"小花ss",timestamp,"女","江西"));
+    //    userDao.update(new User(42,"小花ss",timestamp,"女","江西"));
        // System.out.println(user);
-//        for(User u : users){
-//            System.out.println(u);
-//        }
+        for(User u : user){
+            System.out.println(u);
+        }
         //6.释放资源
         session.close();
     }
