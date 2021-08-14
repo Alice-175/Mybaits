@@ -3,13 +3,17 @@ package com.baiye.www.mybaits.executor;
 import com.baiye.www.exceptions.MybatisException;
 import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.confiuration.Mapper;
+import com.baiye.www.mybaits.io.Resources;
 import com.baiye.www.utils.SqlUtil;
 import com.baiye.www.utils.StringUtil;
+import com.baiye.www.utils.XMLConfigBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -32,6 +36,19 @@ public class SimpleExecutor implements Executor{
     public SimpleExecutor(Configuration configuration) {
         this.configuration = configuration;
     }
+    public SimpleExecutor(){
+        this("SqlMapConfig.xml");
+    }
+    public SimpleExecutor(String resourceName) {
+        InputStream in = null;
+        try {
+            in = Resources.getResourceAsStream(resourceName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        configuration = XMLConfigBuilder.loadConfiguration(in);
+    }
+
     @Override
     public <E> List<E> query(Mapper mapper,Object[] object) {
         PreparedStatement preparedStatement = null;
@@ -73,6 +90,10 @@ public class SimpleExecutor implements Executor{
 
 
     }
+    public <E> List<E> query(String mapperName, Object[] object) {
+        Mapper mapper = configuration.getMappers().get(mapperName);
+        return query(mapper,object);
+    }
 
     @Override
     public void close() {
@@ -99,6 +120,10 @@ public class SimpleExecutor implements Executor{
         }finally {
             release(preparedStatement,null);
         }
+    }
+    public int update(String mapperName, Object[] object) {
+        Mapper mapper = configuration.getMappers().get(mapperName);
+        return update(mapper,object);
     }
 
     private void release(PreparedStatement pstm,ResultSet rs){
