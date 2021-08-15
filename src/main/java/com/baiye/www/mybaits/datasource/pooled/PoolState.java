@@ -14,10 +14,13 @@ import java.util.List;
 public class PoolState {
 
     protected PooledDataSource dataSource;
-    protected final List<Connection> idleConnections = new ArrayList<>();
-    protected final List<Connection> activeConnections = new ArrayList<>();
+    protected final List<PooledConnection> idleConnections = new ArrayList<>();
+    protected final List<PooledConnection> activeConnections = new ArrayList<>();
     public PoolState(PooledDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
+    public PoolState() {
+
+    }
 }

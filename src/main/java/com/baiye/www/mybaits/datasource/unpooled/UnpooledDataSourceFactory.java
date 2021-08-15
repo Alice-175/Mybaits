@@ -1,5 +1,6 @@
 package com.baiye.www.mybaits.datasource.unpooled;
 
+import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.datasource.DataSourceFactory;
 
 import javax.sql.DataSource;
@@ -13,8 +14,16 @@ import javax.sql.DataSource;
  */
 public class UnpooledDataSourceFactory implements DataSourceFactory {
     protected DataSource dataSource;
+    public UnpooledDataSourceFactory(Configuration con) {
+        this.dataSource = new UnpooledDataSource(con);
+    }
+
+    public UnpooledDataSourceFactory() {
+
+    }
+
     @Override
     public DataSource getDataSource() {
-        return new UnpooledDataSource();
+        return dataSource;
     }
 }

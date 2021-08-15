@@ -1,5 +1,7 @@
 package com.baiye.www.mybaits.datasource.unpooled;
 
+import com.baiye.www.mybaits.confiuration.Configuration;
+
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.*;
@@ -45,6 +47,13 @@ public class UnpooledDataSource implements DataSource {
 
     }
 
+    public UnpooledDataSource(Configuration con) {
+        this.driver = con.getDriver();
+        this.url = con.getUrl();
+        this.username = con.getUsername();
+        this.password = con.getPassword();
+    }
+
     private Connection doGetConnection(String username, String password) throws SQLException {
         return DriverManager.getConnection(url,username,password);
     }
@@ -58,7 +67,7 @@ public class UnpooledDataSource implements DataSource {
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return null;
+        return doGetConnection(username, password);
     }
 
 
@@ -100,5 +109,69 @@ public class UnpooledDataSource implements DataSource {
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return null;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public void setDriver(String driver) {
+        this.driver = driver;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public static Map<String, Driver> getRegisteredDrivers() {
+        return registeredDrivers;
+    }
+
+    public static void setRegisteredDrivers(Map<String, Driver> registeredDrivers) {
+        UnpooledDataSource.registeredDrivers = registeredDrivers;
+    }
+
+    public Boolean getAutoCommit() {
+        return autoCommit;
+    }
+
+    public void setAutoCommit(Boolean autoCommit) {
+        this.autoCommit = autoCommit;
+    }
+
+    public Integer getDefaultTransactionIsolationLevel() {
+        return defaultTransactionIsolationLevel;
+    }
+
+    public void setDefaultTransactionIsolationLevel(Integer defaultTransactionIsolationLevel) {
+        this.defaultTransactionIsolationLevel = defaultTransactionIsolationLevel;
+    }
+
+    public Integer getDefaultNetworkTimeout() {
+        return defaultNetworkTimeout;
+    }
+
+    public void setDefaultNetworkTimeout(Integer defaultNetworkTimeout) {
+        this.defaultNetworkTimeout = defaultNetworkTimeout;
     }
 }

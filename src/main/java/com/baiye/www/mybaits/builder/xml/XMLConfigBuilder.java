@@ -1,9 +1,12 @@
-package com.baiye.www.utils;
+package com.baiye.www.mybaits.builder.xml;
 
 import com.baiye.www.mybaits.annotation.Select;
 import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.confiuration.Mapper;
+import com.baiye.www.mybaits.datasource.pooled.PooledDataSourceFactory;
 import com.baiye.www.mybaits.io.Resources;
+import com.baiye.www.mybaits.mapping.Environment;
+import com.sun.jndi.ldap.pool.PooledConnectionFactory;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -37,6 +40,9 @@ public class XMLConfigBuilder {
             Document document=saxReader.read(in);
             Element root = document.getRootElement();
             //xpath '//'表示在当先所选节点查找
+            List dataSourceNode = root.selectNodes("//dataSource");
+            String type = ((Element)dataSourceNode.get(0)).attributeValue("type");
+            config.setDataSourceType(type);
             List nodes = root.selectNodes("//property");
             Iterator iterator=nodes.iterator();
             while (iterator.hasNext()){
@@ -81,6 +87,10 @@ public class XMLConfigBuilder {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("loadConfiguration error!");
+        }
+
+        if(config.getDataSourceType().equals("POOLED")){
+            config.setEnvironment(new Environment(null,null,new PooledDataSourceFactory(config).getDataSource()));
         }
         return config;
     }

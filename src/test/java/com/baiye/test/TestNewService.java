@@ -1,14 +1,6 @@
 package com.baiye.test;
 
-import com.baiye.www.mybaits.confiuration.Configuration;
-import com.baiye.www.mybaits.confiuration.Mapper;
-import com.baiye.www.mybaits.executor.SimpleExecutor;
-import com.baiye.www.mybaits.io.Resources;
-import com.baiye.www.utils.XMLConfigBuilder;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
 /**
  * @author GUOZHIPENG

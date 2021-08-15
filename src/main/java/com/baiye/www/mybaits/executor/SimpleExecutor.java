@@ -3,10 +3,11 @@ package com.baiye.www.mybaits.executor;
 import com.baiye.www.exceptions.MybatisException;
 import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.confiuration.Mapper;
+import com.baiye.www.mybaits.datasource.unpooled.UnpooledDataSourceFactory;
 import com.baiye.www.mybaits.io.Resources;
 import com.baiye.www.utils.SqlUtil;
 import com.baiye.www.utils.StringUtil;
-import com.baiye.www.utils.XMLConfigBuilder;
+import com.baiye.www.mybaits.builder.xml.XMLConfigBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
@@ -63,7 +63,14 @@ public class SimpleExecutor implements Executor{
         try {
             resultSql = SqlUtil.paramToSql(originalSql,object);
             logger.info("resultSql = "+resultSql);
-            conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
+            if("UNPOOLED".equals(configuration.getDataSourceType())){
+                UnpooledDataSourceFactory unpooledDataSourceFactory = new UnpooledDataSourceFactory(configuration);
+                conn = unpooledDataSourceFactory.getDataSource().getConnection();
+               // conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
+            }else if("POOLED".equals(configuration.getDataSourceType())) {
+                conn = configuration.getEnvironment().getDataSource().getConnection();
+            }
+
             preparedStatement = conn.prepareStatement(resultSql);
             Class pojoClass = Class.forName(resultType);
             resultSet = preparedStatement.executeQuery();
@@ -85,7 +92,7 @@ public class SimpleExecutor implements Executor{
         } catch (InvocationTargetException | IllegalAccessException | IntrospectionException | SQLException | InstantiationException | ClassNotFoundException e) {
             throw new MybatisException("query时sql执行或注入实体类错误",e);
         }finally {
-            release(preparedStatement,resultSet);
+            release(conn,preparedStatement,resultSet);
         }
 
 
@@ -118,7 +125,7 @@ public class SimpleExecutor implements Executor{
         } catch (SQLException | IntrospectionException | IllegalAccessException | InvocationTargetException e) {
             throw new MybatisException("update时sql执行或注入实体类错误",e);
         }finally {
-            release(preparedStatement,null);
+            release(conn,preparedStatement,null);
         }
     }
     public int update(String mapperName, Object[] object) {
@@ -126,7 +133,14 @@ public class SimpleExecutor implements Executor{
         return update(mapper,object);
     }
 
-    private void release(PreparedStatement pstm,ResultSet rs){
+    private void release(Connection con,PreparedStatement pstm,ResultSet rs){
+        if(con != null){
+            try {
+                con.close();
+            }catch(Exception e){
+                throw new MybatisException("资源释放异常",e);
+            }
+        }
         if(rs != null){
             try {
                 rs.close();
@@ -143,6 +157,7 @@ public class SimpleExecutor implements Executor{
             }
         }
     }
+
 
 
 

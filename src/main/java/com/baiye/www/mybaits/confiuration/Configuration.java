@@ -1,5 +1,7 @@
 package com.baiye.www.mybaits.confiuration;
 
+import com.baiye.www.mybaits.mapping.Environment;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,12 +13,22 @@ import java.util.Map;
  * @Description:
  */
 public class Configuration {
+    protected Environment environment;
+    private String dataSourceType;
     private String driver;
     private String url;
     private String username;
     private String password;
     //全限定类名+方法名，mapper
     private Map<String,Mapper> mappers=new HashMap<String,Mapper>();
+
+    public String getDataSourceType() {
+        return dataSourceType;
+    }
+
+    public void setDataSourceType(String dataSourceType) {
+        this.dataSourceType = dataSourceType;
+    }
 
     public String getDriver() {
         return driver;
@@ -56,5 +68,13 @@ public class Configuration {
 
     public void setMappers(Map<String, Mapper> mappers) {
         this.mappers = mappers;
+    }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 }

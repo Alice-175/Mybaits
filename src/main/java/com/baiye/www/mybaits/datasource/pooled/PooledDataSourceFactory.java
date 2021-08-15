@@ -1,5 +1,6 @@
 package com.baiye.www.mybaits.datasource.pooled;
 
+import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.datasource.unpooled.UnpooledDataSourceFactory;
 
 /**
@@ -10,7 +11,7 @@ import com.baiye.www.mybaits.datasource.unpooled.UnpooledDataSourceFactory;
  * @Description:
  */
 public class PooledDataSourceFactory extends UnpooledDataSourceFactory {
-    public PooledDataSourceFactory() {
-        this.dataSource = new PooledDataSource();
+    public PooledDataSourceFactory(Configuration config) {
+        this.dataSource = new PooledDataSource(config);
     }
 }

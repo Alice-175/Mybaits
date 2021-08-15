@@ -2,7 +2,7 @@ package com.baiye.www.mybaits.sqlsession;
 
 import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.sqlsession.defaults.DefaultSqlSessionFactory;
-import com.baiye.www.utils.XMLConfigBuilder;
+import com.baiye.www.mybaits.builder.xml.XMLConfigBuilder;
 
 import java.io.InputStream;
 import java.util.Properties;
