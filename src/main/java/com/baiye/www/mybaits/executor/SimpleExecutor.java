@@ -119,7 +119,14 @@ public class SimpleExecutor implements Executor{
         try {
             resultSql = SqlUtil.paramToSql(originalSql,object);
             logger.info("resultSql = "+resultSql);
-            conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
+            if("UNPOOLED".equals(configuration.getDataSourceType())){
+                UnpooledDataSourceFactory unpooledDataSourceFactory = new UnpooledDataSourceFactory(configuration);
+                conn = unpooledDataSourceFactory.getDataSource().getConnection();
+                // conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
+            }else if("POOLED".equals(configuration.getDataSourceType())) {
+                conn = configuration.getEnvironment().getDataSource().getConnection();
+            }
+            //conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
             preparedStatement = conn.prepareStatement(resultSql);
             return preparedStatement.executeUpdate();
         } catch (SQLException | IntrospectionException | IllegalAccessException | InvocationTargetException e) {

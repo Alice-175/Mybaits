@@ -40,7 +40,7 @@ public class MybatisTest {
        // User user = userDao.findById("41");
         List<User> user = userDao.findSome("%王%","男");
    //     userDao.insertUser(new User(101,"小花",new Date(1920,11,23),"男","江西"));
-//        userDao.deletebyId("49");
+        userDao.deletebyId("49");
         long time = System.currentTimeMillis();
         java.sql.Date date = new java.sql.Date(time);
         java.sql.Timestamp timestamp = new Timestamp(time);
