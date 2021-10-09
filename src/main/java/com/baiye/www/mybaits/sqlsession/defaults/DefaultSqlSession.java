@@ -25,6 +25,7 @@ import java.util.List;
 public class DefaultSqlSession implements SqlSession {
     protected Configuration configuration;
     private Executor executor;
+
     public DefaultSqlSession(Configuration configuration) {
         this.configuration = configuration;
         executor = new SimpleExecutor(configuration);
@@ -82,5 +83,9 @@ public class DefaultSqlSession implements SqlSession {
     @Override
     public void close() {
         executor.close();
+    }
+    @Override
+    public void clearCache() {
+        executor.clearLocalCache();
     }
 }

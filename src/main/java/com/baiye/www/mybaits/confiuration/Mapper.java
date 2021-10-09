@@ -1,5 +1,7 @@
 package com.baiye.www.mybaits.confiuration;
 
+import org.dom4j.Element;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -10,17 +12,15 @@ package com.baiye.www.mybaits.confiuration;
 public class Mapper {
 
     private String sql;
+    private Element element;
     private String resultType;
     private String parameterType;
     private String resultMap;
 
-    public Mapper(String sql, String resultType) {
-        this.sql = sql;
-        this.resultType = resultType;
-    }
 
-    public Mapper(String sql, String resultType, String parameterType, String resultMap) {
+    public Mapper(String sql, Element element, String resultType, String parameterType, String resultMap) {
         this.sql = sql;
+        this.element = element;
         this.resultType = resultType;
         this.parameterType = parameterType;
         this.resultMap = resultMap;
@@ -60,5 +60,13 @@ public class Mapper {
 
     public void setResultMap(String resultMap) {
         this.resultMap = resultMap;
+    }
+
+    public Element getElement() {
+        return element;
+    }
+
+    public void setElement(Element element) {
+        this.element = element;
     }
 }

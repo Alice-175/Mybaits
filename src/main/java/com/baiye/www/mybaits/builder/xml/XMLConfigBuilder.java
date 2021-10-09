@@ -7,10 +7,7 @@ import com.baiye.www.mybaits.datasource.pooled.PooledDataSourceFactory;
 import com.baiye.www.mybaits.io.Resources;
 import com.baiye.www.mybaits.mapping.Environment;
 import com.sun.jndi.ldap.pool.PooledConnectionFactory;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
+import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 
 import java.io.IOException;
@@ -163,15 +160,30 @@ public class XMLConfigBuilder {
                 String resultType = element.attributeValue("resultType");
                 String parameterType = element.attributeValue("parameterType");
                 String resultMap = element.attributeValue("resultMap");
-                String sql = element.getText();
                 String key = namespace+"."+id;
-                Mapper mapper=new Mapper(sql,resultType,parameterType,resultMap);
+//                if(element.selectNodes("//*").size()>0){
+//                    List n = element.selectNodes("//*");
+//                    System.out.println("ok");
+//                }else {
+//                    System.out.println("no");
+//                }
+
+                String sql = element.getText();
+                System.out.println("sql="+sql);
+//                SqlParser sqlParser = new SqlParser();
+//                Map<String, Object> hashMap = new HashMap();
+//                hashMap.put("sex", "男");
+//                Map<String, Object> currParams = new HashMap<String, Object>();
+//                StringBuilder sb = new StringBuilder();
+//                sqlParser.parserElement(element,currParams,hashMap,sb);
+//                System.out.println(sb.toString());
+                Mapper mapper=new Mapper(sql,element,resultType,parameterType,resultMap);
                 mappers.put(key, mapper);
             }
             in.close();
 
 
-        } catch (IOException | DocumentException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

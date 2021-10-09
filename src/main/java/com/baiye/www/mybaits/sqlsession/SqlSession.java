@@ -19,6 +19,6 @@ public interface SqlSession {
     int insert(String mapperName,Object[] parameter);
     int update(String mapperName,Object[] parameter);
     int delete(String mapperName,Object[] parameter);
-
+    void clearCache();
     void close();
 }

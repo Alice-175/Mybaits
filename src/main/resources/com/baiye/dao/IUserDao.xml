@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mapper namespace="com.baiye.www.dao.IUserDao">
     <!--配置查询所有-->
+    <select id="findById" resultType="com.baiye.www.domain.User" parameterType="Integer">
+        select * from user where id= #{id}
+<!--        <if test="sex != null">-->
+<!--            and sex = #{sex}-->
+<!--        </if>-->
+    </select>
     <select id="findAll" resultType="com.baiye.www.domain.User">
         select * from user
     </select>
-    <select id="findById" resultType="com.baiye.www.domain.User" parameterType="Integer">
-        select * from user where id= #{id}
-    </select>
+
     <select id="findSome" resultType="com.baiye.www.domain.User">
         select * from `user` where username LIKE #{username} and sex = #{sex}
     </select>

@@ -17,4 +17,6 @@ public interface Executor {
     void close();
 
     int update(Mapper mapper, Object[] parameter);
+
+    void clearLocalCache();
 }

@@ -1,5 +1,7 @@
 package com.baiye.www.mybaits.confiuration;
 
+import com.baiye.www.mybaits.cache.Cache;
+import com.baiye.www.mybaits.cache.PerpetualCache;
 import com.baiye.www.mybaits.mapping.Environment;
 
 import java.util.HashMap;
@@ -19,6 +21,8 @@ public class Configuration {
     private String url;
     private String username;
     private String password;
+    private Cache perpetualCache=new PerpetualCache();
+    private boolean enableCache;
     //全限定类名+方法名，mapper
     private Map<String,Mapper> mappers=new HashMap<String,Mapper>();
 
@@ -76,5 +80,21 @@ public class Configuration {
 
     public void setEnvironment(Environment environment) {
         this.environment = environment;
+    }
+
+    public Cache getPerpetualCache() {
+        return perpetualCache;
+    }
+
+    public void clearPerpetualCache() {
+        this.perpetualCache.clear();
+    }
+
+    public boolean isEnableCache() {
+        return enableCache;
+    }
+
+    public void cleanEnableCache(boolean enableCache) {
+        this.enableCache = enableCache;
     }
 }

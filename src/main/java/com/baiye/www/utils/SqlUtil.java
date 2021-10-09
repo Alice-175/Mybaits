@@ -34,16 +34,30 @@ public class SqlUtil {
                 PropertyDescriptor propertyDescriptor = new PropertyDescriptor(fieldName, obj);
                 Method readMethod = propertyDescriptor.getReadMethod();
                 Object o = readMethod.invoke(object[0]);
-                originalSql = originalSql.replace("#{" + fieldName + "}", "\"" + o + "" + "\"");
+                if(o!=null){
+                    originalSql = originalSql.replace("#{" + fieldName + "}", "\""+o + ""+"\"");
+                }else {
+                    originalSql = originalSql.replace("#{" + fieldName + "}", "null");
+                }
             }
             return originalSql;
         } else { //多个参数，传的也是多个基本类型
             for (Object o : object) {
-                HashMap<String, String> map = (HashMap<String, String>) o;
-                for (Map.Entry<String, String> entry : map.entrySet()) {
+                //前面已经是String，String，防止意外改为String,Object
+                HashMap<String, Object> map = (HashMap<String, Object>) o;
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
                     String regex = "#\\{" + entry.getKey() + "}";
-                    //将 sql 语句中的 #{*} 替换为 ？
-                    originalSql = originalSql.replaceAll(regex, "\"" + entry.getValue() + "" + "\"");
+                    //将 sql 语句中的 #{*} 替换为实际参数
+                    if(entry.getValue() instanceof Integer||entry.getValue().equals("1 OR 1")){
+                        originalSql = originalSql.replaceAll(regex,  entry.getValue() + "");
+                    }else {
+                        if(entry.getValue()!=null){
+                            originalSql = originalSql.replaceAll(regex,  "\""+entry.getValue() + ""+"\"");
+                        }else {
+                            originalSql = originalSql.replaceAll(regex,   "null");
+                        }
+
+                    }
                 }
             }
             return originalSql;
