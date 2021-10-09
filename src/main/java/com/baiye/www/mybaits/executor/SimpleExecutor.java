@@ -124,6 +124,9 @@ public class SimpleExecutor implements Executor{
                 list.add(pojo);
             }
             localCache.putObject(resultSql,list);
+            if(configuration.isEnableCache()){
+                configuration.getPerpetualCache().putObject(resultSql,list);
+            }
             return list;
         } catch (InvocationTargetException | IllegalAccessException | IntrospectionException | SQLException | InstantiationException | ClassNotFoundException e) {
             throw new MybatisException("query时sql执行或注入实体类错误",e);
