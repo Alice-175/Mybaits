@@ -22,6 +22,7 @@ public interface IUserDao {
     List<User> findAll();
     @Select("select * from user where id=#{id}")
     User findById(String id);
+    List<User> findSomeOgnl(User u);
     List<User> findSome(@Param("username") String username,@Param("sex") String sex);
     void insertUser(User user);
 

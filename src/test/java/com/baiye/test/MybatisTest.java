@@ -39,18 +39,19 @@ public class MybatisTest {
       //  List<User> user = userDao.findAll();
         //User u = new User();
         //u.setSex("男");
-       // User user = userDao.findById("41");
-        //List<User> user = userDao.findSome("%王%","男");
-        userDao.insertUser(new User(105,"小q",new Date(1920,11,23),"男","江西"));
+        //User user = userDao.findById("41");
+      //  List<User> user = userDao.findSome("%王%","男");
+        List<User> user = userDao.findSomeOgnl(new User(105,"%王%",new Date(1920,11,23),null,"江西"));
+       // userDao.insertUser(new User(105,"小q",new Date(1920,11,23),"男","江西"));
     //    userDao.deletebyId("49");
 //        long time = System.currentTimeMillis();
 //        java.sql.Date date = new java.sql.Date(time);
 //        java.sql.Timestamp timestamp = new Timestamp(time);
         //userDao.update(new User(42,"小花k",timestamp,"女","江西"));
-     //   System.out.println(user);
-//        for(User u : user){
-//            System.out.println(u);
-//        }
+       // System.out.println(user);
+        for(User u : user){
+            System.out.println(u);
+        }
         //6.释放资源
         //session.commit();
         session.close();

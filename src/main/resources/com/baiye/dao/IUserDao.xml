@@ -3,16 +3,20 @@
     <!--配置查询所有-->
     <select id="findById" resultType="com.baiye.www.domain.User" parameterType="Integer">
         select * from user where id= #{id}
-<!--        <if test="sex != null">-->
-<!--            and sex = #{sex}-->
-<!--        </if>-->
     </select>
+
     <select id="findAll" resultType="com.baiye.www.domain.User">
         select * from user
     </select>
 
     <select id="findSome" resultType="com.baiye.www.domain.User">
         select * from `user` where username LIKE #{username} and sex = #{sex}
+    </select>
+    <select id="findSomeOgnl" resultType="com.baiye.www.domain.User" parameterType="com.baiye.www.domain.User">
+        select * from `user` where username LIKE #{username} and username LIKE #{username}
+        <if test="sex != null">
+            and sex = #{sex}
+        </if>
     </select>
     <insert id="insertUser" parameterType="com.baiye.www.domain.User">
         insert into user(username,birthday,sex,address) values(#{username},#{birthday},#{sex},#{address})
