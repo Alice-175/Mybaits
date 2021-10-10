@@ -4,7 +4,6 @@ import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.datasource.unpooled.UnpooledDataSource;
 
 import javax.sql.DataSource;
-
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,8 +19,6 @@ import java.util.logging.Logger;
  */
 public class PooledDataSource implements DataSource {
     private final UnpooledDataSource dataSource;
-    private PoolState poolState;
-
     protected int poolMaximumActiveConnections = 10;
     protected int poolMaximumIdleConnections = 5;
     protected int poolMaximumCheckoutTime = 20000;
@@ -30,12 +27,13 @@ public class PooledDataSource implements DataSource {
     protected String poolPingQuery = "NO PING QUERY SET";
     protected boolean poolPingEnabled;
     protected int poolPingConnectionsNotUsedFor;
-
+    private PoolState poolState;
     private int expectedConnectionTypeCode;
 
     public PooledDataSource() {
         this.dataSource = new UnpooledDataSource();
     }
+
     public PooledDataSource(UnpooledDataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -45,9 +43,9 @@ public class PooledDataSource implements DataSource {
         this.dataSource = new UnpooledDataSource(config);
         try {
             Connection conn = dataSource.getConnection();
-            PooledConnection pooledConnection = new PooledConnection(conn,this);
+            PooledConnection pooledConnection = new PooledConnection(conn, this);
             this.poolState = new PoolState();
-            for(int i=0;i<poolMaximumIdleConnections;i++){
+            for (int i = 0; i < poolMaximumIdleConnections; i++) {
                 poolState.idleConnections.add(pooledConnection);
             }
 
@@ -55,20 +53,21 @@ public class PooledDataSource implements DataSource {
             e.printStackTrace();
         }
     }
+
     public PooledConnection popConnection(String username, String password) throws SQLException {
         PooledConnection con = null;
-        while (con == null){
-            synchronized (poolState){
-                if(poolState.idleConnections.size()>0){
+        while (con == null) {
+            synchronized (poolState) {
+                if (poolState.idleConnections.size() > 0) {
                     con = poolState.idleConnections.remove(0);
-                }else {
-                    if (poolState.activeConnections.size() < poolMaximumActiveConnections){
+                } else {
+                    if (poolState.activeConnections.size() < poolMaximumActiveConnections) {
                         Connection conn = dataSource.getConnection();
-                        con = new PooledConnection(conn,this);
+                        con = new PooledConnection(conn, this);
 
-                    }else{
+                    } else {
                         PooledConnection oldestActiveConnection = poolState.activeConnections.get(0);
-                        if(oldestActiveConnection.isValid()){
+                        if (oldestActiveConnection.isValid()) {
                             poolState.activeConnections.remove(oldestActiveConnection);
                         }
                     }
@@ -79,15 +78,16 @@ public class PooledDataSource implements DataSource {
         poolState.activeConnections.add(con);
         return con;
     }
+
     protected void pushConnection(PooledConnection pooledConnection) {
         synchronized (poolState) {
             poolState.activeConnections.remove(pooledConnection);
-            if(pooledConnection.isValid()){
-                if (poolState.idleConnections.size() < poolMaximumIdleConnections){
+            if (pooledConnection.isValid()) {
+                if (poolState.idleConnections.size() < poolMaximumIdleConnections) {
                     PooledConnection newConn = new PooledConnection(pooledConnection.getRealConnection(), this);
                     poolState.idleConnections.add(newConn);
 
-                }else {
+                } else {
                     try {
                         pooledConnection.getRealConnection().close();
                     } catch (SQLException e) {
@@ -129,20 +129,19 @@ public class PooledDataSource implements DataSource {
     }
 
     @Override
-    public void setLoginTimeout(int seconds) throws SQLException {
-
+    public int getLoginTimeout() throws SQLException {
+        return 0;
     }
 
     @Override
-    public int getLoginTimeout() throws SQLException {
-        return 0;
+    public void setLoginTimeout(int seconds) throws SQLException {
+
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return null;
     }
-
 
 
 }

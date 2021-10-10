@@ -21,10 +21,10 @@ public class Configuration {
     private String url;
     private String username;
     private String password;
-    private Cache perpetualCache=new PerpetualCache();
+    private Cache perpetualCache = new PerpetualCache();
     private boolean enableCache;
     //全限定类名+方法名，mapper
-    private Map<String,Mapper> mappers=new HashMap<String,Mapper>();
+    private Map<String, Mapper> mappers = new HashMap<String, Mapper>();
 
     public String getDataSourceType() {
         return dataSourceType;

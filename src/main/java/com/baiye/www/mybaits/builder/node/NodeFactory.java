@@ -5,19 +5,19 @@ package com.baiye.www.mybaits.builder.node;
  * @version 1.0
  * @date 2021/8/31 16:01
  */
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *  节点工厂
+ * 节点工厂
  */
 public class NodeFactory {
 
-    private static Map<String,BaseNode> nodeMap = new ConcurrentHashMap<String,BaseNode>();
-
     private final static List<String> whileList = Arrays.asList("foreach");
+    private static Map<String, BaseNode> nodeMap = new ConcurrentHashMap<String, BaseNode>();
 
     static {
         nodeMap.put("if", new IfNode());
@@ -31,7 +31,7 @@ public class NodeFactory {
         return whileList.contains(elementName);
     }
 
-    public static void addNode(String nodeName,BaseNode node) {
+    public static void addNode(String nodeName, BaseNode node) {
 
         nodeMap.put(nodeName, node);
 

@@ -14,6 +14,7 @@ import javax.sql.DataSource;
  */
 public class UnpooledDataSourceFactory implements DataSourceFactory {
     protected DataSource dataSource;
+
     public UnpooledDataSourceFactory(Configuration con) {
         this.dataSource = new UnpooledDataSource(con);
     }

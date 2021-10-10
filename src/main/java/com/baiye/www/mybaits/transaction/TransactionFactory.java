@@ -2,7 +2,6 @@ package com.baiye.www.mybaits.transaction;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.util.Properties;
 
 /**
  * @author GUOZHIPENG
@@ -11,7 +10,8 @@ import java.util.Properties;
  */
 public interface TransactionFactory {
 
-    Transaction newTransaction(Connection conn,boolean autoCommit);
-    Transaction newTransaction(DataSource dataSource,boolean autoCommit);
+    Transaction newTransaction(Connection conn, boolean autoCommit);
+
+    Transaction newTransaction(DataSource dataSource, boolean autoCommit);
 
 }

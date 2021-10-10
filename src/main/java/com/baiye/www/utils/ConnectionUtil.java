@@ -15,11 +15,11 @@ import java.sql.DriverManager;
 public class ConnectionUtil {
 
 
-    public static Connection getConnection(Configuration configuration)  {
+    public static Connection getConnection(Configuration configuration) {
         try {
             Class.forName(configuration.getDriver());
-            return DriverManager.getConnection(configuration.getUrl(),configuration.getUsername(),configuration.getPassword());
-        }catch(Exception e){
+            return DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

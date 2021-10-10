@@ -1,6 +1,5 @@
 package com.baiye.www.mybaits.datasource.pooled;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,9 +12,10 @@ import java.util.List;
  */
 public class PoolState {
 
-    protected PooledDataSource dataSource;
     protected final List<PooledConnection> idleConnections = new ArrayList<>();
     protected final List<PooledConnection> activeConnections = new ArrayList<>();
+    protected PooledDataSource dataSource;
+
     public PoolState(PooledDataSource dataSource) {
         this.dataSource = dataSource;
     }

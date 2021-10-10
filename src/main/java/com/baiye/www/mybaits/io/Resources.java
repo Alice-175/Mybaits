@@ -13,7 +13,7 @@ import java.io.InputStream;
 public class Resources {
     public static InputStream getResourceAsStream(String resource) throws IOException {
         InputStream in = Resources.class.getClassLoader().getResourceAsStream(resource);
-        if(in == null){
+        if (in == null) {
             throw new IOException("Could not find resource :" + resource);
         }
         return in;

@@ -17,14 +17,14 @@ import java.util.List;
  * @Description:
  */
 public class DefaultSqlSession implements SqlSession {
+    private final boolean autoCommit;
     protected Configuration configuration;
     private Executor executor;
-    private final boolean autoCommit;
     private boolean dirty;
 
     public DefaultSqlSession(Configuration configuration, boolean autoCommit) {
         this.configuration = configuration;
-        executor = new SimpleExecutor(configuration,autoCommit);
+        executor = new SimpleExecutor(configuration, autoCommit);
         this.autoCommit = autoCommit;
     }
 
@@ -38,20 +38,19 @@ public class DefaultSqlSession implements SqlSession {
 
     @Override
     public <T> T getMapper(Class<T> daoInterfaceClass) {
-        return (T) Proxy.newProxyInstance(daoInterfaceClass.getClassLoader(),new Class[]{daoInterfaceClass},new MapperProxy(this));
+        return (T) Proxy.newProxyInstance(daoInterfaceClass.getClassLoader(), new Class[]{daoInterfaceClass}, new MapperProxy(this));
     }
-
 
 
     @Override
     public <T> T selectOne(String mapperName, Object[] parameter) {
-        List<T> selectList = this.selectList(mapperName,parameter);
-        if(selectList == null || selectList.size() == 0){
+        List<T> selectList = this.selectList(mapperName, parameter);
+        if (selectList == null || selectList.size() == 0) {
             return null;
         }
-        if(selectList.size() == 1){
+        if (selectList.size() == 1) {
             return (T) selectList.get(0);
-        }else{
+        } else {
             throw new RuntimeException("too many result");
         }
     }
@@ -59,30 +58,30 @@ public class DefaultSqlSession implements SqlSession {
     @Override
     public <T> List<T> selectList(String mapperName, Object[] parameter) {
         System.out.println(parameter);
-        return executor.query(configuration.getMappers().get(mapperName),parameter);
+        return executor.query(configuration.getMappers().get(mapperName), parameter);
     }
 
     @Override
     public int insert(String mapperName, Object[] parameter) {
-        dirty=true;
-        return executor.update(configuration.getMappers().get(mapperName),parameter);
+        dirty = true;
+        return executor.update(configuration.getMappers().get(mapperName), parameter);
     }
 
     @Override
     public int update(String mapperName, Object[] parameter) {
-        dirty=true;
-        return executor.update(configuration.getMappers().get(mapperName),parameter);
+        dirty = true;
+        return executor.update(configuration.getMappers().get(mapperName), parameter);
     }
 
     @Override
     public int delete(String mapperName, Object[] parameter) {
-        dirty=true;
-        return executor.update(configuration.getMappers().get(mapperName),parameter);
+        dirty = true;
+        return executor.update(configuration.getMappers().get(mapperName), parameter);
     }
 
     @Override
     public void close() {
-        if(!autoCommit&&dirty){
+        if (!autoCommit && dirty) {
             rollback();
         }
         executor.close();

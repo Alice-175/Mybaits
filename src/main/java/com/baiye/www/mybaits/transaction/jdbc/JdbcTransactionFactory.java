@@ -13,12 +13,12 @@ import java.sql.Connection;
  */
 public class JdbcTransactionFactory implements TransactionFactory {
     @Override
-    public Transaction newTransaction(Connection conn,boolean autoComm) {
-        return new JdbcTransaction(conn,autoComm);
+    public Transaction newTransaction(Connection conn, boolean autoComm) {
+        return new JdbcTransaction(conn, autoComm);
     }
 
     @Override
-    public Transaction newTransaction(DataSource dataSource,boolean autoComm) {
-        return new JdbcTransaction(dataSource,null,autoComm);
+    public Transaction newTransaction(DataSource dataSource, boolean autoComm) {
+        return new JdbcTransaction(dataSource, null, autoComm);
     }
 }

@@ -5,8 +5,10 @@ package com.baiye.www.mybaits.builder.node;
  * @version 1.0
  * @date 2021/8/31 16:01
  */
+
 /**
  * 各种标记
+ *
  * @author rongdi
  */
 public class Attrs {
@@ -37,7 +39,7 @@ public class Attrs {
 
     public final static String RETURN_FLAG = "return-flag";
 
-    public final static String CONSOLE_VAR= "console-var";
+    public final static String CONSOLE_VAR = "console-var";
 
     public final static String DO = "do";
 
@@ -45,9 +47,9 @@ public class Attrs {
 
     public final static String CONDITION = "condition";
 
-    public final static String NAME= "name";
+    public final static String NAME = "name";
 
-    public final static String VALUE= "value";
+    public final static String VALUE = "value";
 
     public static final String TYPE = "type";
 
@@ -57,7 +59,7 @@ public class Attrs {
 
     public static final String ELSE = "else";
 
-    public final static String FILE= "file";
+    public final static String FILE = "file";
 
     public static final String DATE = "date";
 

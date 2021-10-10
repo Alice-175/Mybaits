@@ -1,7 +1,5 @@
 package com.baiye.www.mybaits.sqlsession;
 
-import com.baiye.www.mybaits.confiuration.Mapper;
-
 import java.util.List;
 
 /**
@@ -19,15 +17,17 @@ public interface SqlSession {
 
     <T> List<T> selectList(String mapperName, Object[] parameter);
 
-    int insert(String mapperName,Object[] parameter);
+    int insert(String mapperName, Object[] parameter);
 
-    int update(String mapperName,Object[] parameter);
+    int update(String mapperName, Object[] parameter);
 
-    int delete(String mapperName,Object[] parameter);
+    int delete(String mapperName, Object[] parameter);
 
     void clearCache();
 
-    /**若未提交直接关闭，会回滚*/
+    /**
+     * 若未提交直接关闭，会回滚
+     */
     void close();
 
     void rollback();

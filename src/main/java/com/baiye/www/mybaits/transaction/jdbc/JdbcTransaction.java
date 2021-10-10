@@ -18,14 +18,15 @@ public class JdbcTransaction implements Transaction {
     protected TransactionIsolationLevel level;
     protected boolean autoCommit;
 
-    public JdbcTransaction(Connection conn,boolean autoComm) {
-        this.connection=conn;
-        this.autoCommit=autoComm;
+    public JdbcTransaction(Connection conn, boolean autoComm) {
+        this.connection = conn;
+        this.autoCommit = autoComm;
     }
 
     public JdbcTransaction(DataSource dataSource) {
-        this.dataSource=dataSource;
+        this.dataSource = dataSource;
     }
+
     public JdbcTransaction(DataSource ds, TransactionIsolationLevel desiredLevel, boolean desiredAutoCommit) {
         dataSource = ds;
         level = desiredLevel;
@@ -38,6 +39,10 @@ public class JdbcTransaction implements Transaction {
             openConnection();
         }
         return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
@@ -58,6 +63,7 @@ public class JdbcTransaction implements Transaction {
             connection.close();
         }
     }
+
     protected void resetAutoCommit() {
         try {
             if (!connection.getAutoCommit()) {
@@ -68,6 +74,7 @@ public class JdbcTransaction implements Transaction {
             e.printStackTrace();
         }
     }
+
     protected void openConnection() throws SQLException {
         connection = dataSource.getConnection();
         if (level != null) {
@@ -75,6 +82,7 @@ public class JdbcTransaction implements Transaction {
         }
         setDesiredAutoCommit(autoCommit);
     }
+
     protected void setDesiredAutoCommit(boolean desiredAutoCommit) {
         try {
             if (connection.getAutoCommit() != desiredAutoCommit) {
@@ -83,10 +91,6 @@ public class JdbcTransaction implements Transaction {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
     }
 
     public DataSource getDataSource() {

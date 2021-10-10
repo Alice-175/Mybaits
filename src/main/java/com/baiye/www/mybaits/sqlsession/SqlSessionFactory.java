@@ -9,5 +9,6 @@ package com.baiye.www.mybaits.sqlsession;
  */
 public interface SqlSessionFactory {
     SqlSession openSession();
+
     SqlSession openSession(boolean autoCommit);
 }

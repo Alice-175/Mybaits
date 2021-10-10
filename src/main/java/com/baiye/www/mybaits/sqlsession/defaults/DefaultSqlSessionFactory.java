@@ -13,6 +13,7 @@ import com.baiye.www.mybaits.sqlsession.SqlSessionFactory;
  */
 public class DefaultSqlSessionFactory implements SqlSessionFactory {
     private Configuration configuration;
+
     public DefaultSqlSessionFactory(Configuration configuration) {
         this.configuration = configuration;
     }
@@ -21,6 +22,7 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     public SqlSession openSession() {
         return new DefaultSqlSession(configuration, false);
     }
+
     @Override
     public SqlSession openSession(boolean autoCommit) {
         return new DefaultSqlSession(configuration, autoCommit);

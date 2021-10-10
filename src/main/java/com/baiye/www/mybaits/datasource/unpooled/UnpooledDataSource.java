@@ -18,20 +18,21 @@ import java.util.logging.Logger;
  * @Description:
  */
 public class UnpooledDataSource implements DataSource {
+    private static Map<String, Driver> registeredDrivers = new ConcurrentHashMap<>();
+
+    static {
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
+            String driverName = driver.getClass().getName();
+            registeredDrivers.put(driverName, driver);
+        }
+    }
+
     private String driver;
     private String url;
     private String username;
     private String password;
-    private static Map<String, Driver> registeredDrivers = new ConcurrentHashMap<>();
-    static {
-        Enumeration<Driver> drivers = DriverManager.getDrivers();
-        while (drivers.hasMoreElements()){
-            Driver driver = drivers.nextElement();
-            String driverName = driver.getClass().getName();
-            registeredDrivers.put(driverName,driver);
-        }
-    }
-
     private Boolean autoCommit;
     private Integer defaultTransactionIsolationLevel;
     private Integer defaultNetworkTimeout;
@@ -54,8 +55,16 @@ public class UnpooledDataSource implements DataSource {
         this.password = con.getPassword();
     }
 
+    public static Map<String, Driver> getRegisteredDrivers() {
+        return registeredDrivers;
+    }
+
+    public static void setRegisteredDrivers(Map<String, Driver> registeredDrivers) {
+        UnpooledDataSource.registeredDrivers = registeredDrivers;
+    }
+
     private Connection doGetConnection(String username, String password) throws SQLException {
-        return DriverManager.getConnection(url,username,password);
+        return DriverManager.getConnection(url, username, password);
     }
 
     @Override
@@ -63,13 +72,10 @@ public class UnpooledDataSource implements DataSource {
         return doGetConnection(username, password);
     }
 
-
-
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
         return doGetConnection(username, password);
     }
-
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
@@ -81,30 +87,25 @@ public class UnpooledDataSource implements DataSource {
         return false;
     }
 
-
     @Override
     public PrintWriter getLogWriter() throws SQLException {
         return null;
     }
-
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
 
     }
 
-
-    @Override
-    public void setLoginTimeout(int seconds) throws SQLException {
-
-    }
-
-
     @Override
     public int getLoginTimeout() throws SQLException {
         return 0;
     }
 
+    @Override
+    public void setLoginTimeout(int seconds) throws SQLException {
+
+    }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
@@ -141,14 +142,6 @@ public class UnpooledDataSource implements DataSource {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public static Map<String, Driver> getRegisteredDrivers() {
-        return registeredDrivers;
-    }
-
-    public static void setRegisteredDrivers(Map<String, Driver> registeredDrivers) {
-        UnpooledDataSource.registeredDrivers = registeredDrivers;
     }
 
     public Boolean getAutoCommit() {

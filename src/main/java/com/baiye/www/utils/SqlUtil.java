@@ -6,7 +6,6 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,9 +33,9 @@ public class SqlUtil {
                 PropertyDescriptor propertyDescriptor = new PropertyDescriptor(fieldName, obj);
                 Method readMethod = propertyDescriptor.getReadMethod();
                 Object o = readMethod.invoke(object[0]);
-                if(o!=null){
-                    originalSql = originalSql.replace("#{" + fieldName + "}", "\""+o + ""+"\"");
-                }else {
+                if (o != null) {
+                    originalSql = originalSql.replace("#{" + fieldName + "}", "\"" + o + "" + "\"");
+                } else {
                     originalSql = originalSql.replace("#{" + fieldName + "}", "null");
                 }
             }
@@ -48,13 +47,13 @@ public class SqlUtil {
                 for (Map.Entry<String, Object> entry : map.entrySet()) {
                     String regex = "#\\{" + entry.getKey() + "}";
                     //将 sql 语句中的 #{*} 替换为实际参数
-                    if(entry.getValue() instanceof Integer||entry.getValue().equals("1 OR 1")){
-                        originalSql = originalSql.replaceAll(regex,  entry.getValue() + "");
-                    }else {
-                        if(entry.getValue()!=null){
-                            originalSql = originalSql.replaceAll(regex,  "\""+entry.getValue() + ""+"\"");
-                        }else {
-                            originalSql = originalSql.replaceAll(regex,   "null");
+                    if (entry.getValue() instanceof Integer || entry.getValue().equals("1 OR 1")) {
+                        originalSql = originalSql.replaceAll(regex, entry.getValue() + "");
+                    } else {
+                        if (entry.getValue() != null) {
+                            originalSql = originalSql.replaceAll(regex, "\"" + entry.getValue() + "" + "\"");
+                        } else {
+                            originalSql = originalSql.replaceAll(regex, "null");
                         }
 
                     }

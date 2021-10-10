@@ -13,7 +13,7 @@ import java.sql.SQLException;
  */
 class PooledConnection implements InvocationHandler {
     private static final String CLOSE = "close";
-    private static final Class<?>[] IFACES = new Class<?>[] { Connection.class };
+    private static final Class<?>[] IFACES = new Class<?>[]{Connection.class};
 
     private final int hashCode;
     private final PooledDataSource dataSource;
@@ -24,6 +24,7 @@ class PooledConnection implements InvocationHandler {
     private long lastUsedTimestamp;
     private int connectionTypeCode;
     private boolean valid;
+
     public PooledConnection(Connection connection, PooledDataSource dataSource) {
         this.hashCode = connection.hashCode();
         this.realConnection = connection;
@@ -44,8 +45,7 @@ class PooledConnection implements InvocationHandler {
         return method.invoke(realConnection, args);
     }
 
-    private boolean validate(Connection conn)
-    {
+    private boolean validate(Connection conn) {
         boolean isValidated = false;
         try {
             return conn.isClosed();
@@ -58,6 +58,7 @@ class PooledConnection implements InvocationHandler {
     public Connection getProxyConnection() {
         return proxyConnection;
     }
+
     public Connection getRealConnection() {
         return realConnection;
     }

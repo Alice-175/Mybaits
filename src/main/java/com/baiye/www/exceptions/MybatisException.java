@@ -7,16 +7,19 @@ package com.baiye.www.exceptions;
  * @Date: 2021/07/08/10:50
  * @Description:
  */
-public class MybatisException extends RuntimeException{
-    public MybatisException(){
+public class MybatisException extends RuntimeException {
+    public MybatisException() {
     }
-    public MybatisException(String message){
+
+    public MybatisException(String message) {
         super(message);
     }
-    public MybatisException(String message,Throwable cause){
+
+    public MybatisException(String message, Throwable cause) {
         super(message, cause);
     }
-    public MybatisException(Throwable cause){
+
+    public MybatisException(Throwable cause) {
         super(cause);
     }
 }

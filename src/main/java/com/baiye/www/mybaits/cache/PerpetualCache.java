@@ -12,6 +12,7 @@ import java.util.Map;
 public class PerpetualCache implements Cache {
 
     private final Map<Object, Object> cache = new HashMap<>();
+
     @Override
     public String getId() {
         return null;

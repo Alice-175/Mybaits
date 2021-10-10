@@ -7,11 +7,11 @@ import com.baiye.www.mybaits.datasource.pooled.PooledDataSourceFactory;
 import com.baiye.www.mybaits.datasource.unpooled.UnpooledDataSourceFactory;
 import com.baiye.www.mybaits.io.Resources;
 import com.baiye.www.mybaits.mapping.Environment;
-import com.sun.jndi.ldap.pool.PooledConnectionFactory;
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -32,30 +32,30 @@ public class XMLConfigBuilder {
 
 
     public static Configuration loadConfiguration(InputStream in) {
-        Configuration config=new Configuration();
-        SAXReader saxReader=new SAXReader();
+        Configuration config = new Configuration();
+        SAXReader saxReader = new SAXReader();
         try {
-            Document document=saxReader.read(in);
+            Document document = saxReader.read(in);
             Element root = document.getRootElement();
             //xpath '//'表示在当先所选节点查找
             List dataSourceNode = root.selectNodes("//dataSource");
-            String type = ((Element)dataSourceNode.get(0)).attributeValue("type");
+            String type = ((Element) dataSourceNode.get(0)).attributeValue("type");
             config.setDataSourceType(type);
             List nodes = root.selectNodes("//property");
-            Iterator iterator=nodes.iterator();
-            while (iterator.hasNext()){
+            Iterator iterator = nodes.iterator();
+            while (iterator.hasNext()) {
                 Element element = (Element) iterator.next();
                 String name = element.attributeValue("name");
                 String value = element.attributeValue("value");
-                if("driver".equals(name)){
+                if ("driver".equals(name)) {
                     config.setDriver(value);
-                }else if ("url".equals(name)){
+                } else if ("url".equals(name)) {
                     config.setUrl(value);
-                }else if ("username".equals(name)){
+                } else if ("username".equals(name)) {
                     config.setUsername(value);
-                }else if ("password".equals(name)){
+                } else if ("password".equals(name)) {
                     config.setPassword(value);
-                }else{
+                } else {
                     throw new RuntimeException("xml sql config error!");
                 }
             }
@@ -63,21 +63,21 @@ public class XMLConfigBuilder {
             //mappers
             List mapperList = root.selectNodes("//mappers/mapper");
             Iterator mapperIterator = mapperList.iterator();
-            Map<String, Mapper> mappers=new HashMap<>();
-            while (mapperIterator.hasNext()){
+            Map<String, Mapper> mappers = new HashMap<>();
+            while (mapperIterator.hasNext()) {
                 Element element = (Element) mapperIterator.next();
                 Attribute attribute = element.attribute("resource");
-                if(attribute != null){
+                if (attribute != null) {
                     //使用xml
-                    String classPath=attribute.getValue();
+                    String classPath = attribute.getValue();
                     Map<String, Mapper> mapper = loadMapperXMLConfiguration(classPath);
                     mappers.putAll(mapper);
-                }else if(element.attribute("class") != null){
+                } else if (element.attribute("class") != null) {
                     //使用注解
-                    String classPath=element.attribute("class").getValue();
+                    String classPath = element.attribute("class").getValue();
                     Map<String, Mapper> mapper = loadMapperAnnotation(classPath);
                     mappers.putAll(mapper);
-                }else {
+                } else {
                     throw new RuntimeException("xml mapper config error");
                 }
             }
@@ -87,43 +87,44 @@ public class XMLConfigBuilder {
             System.out.println("loadConfiguration error!");
         }
 
-        if(config.getDataSourceType().equals("POOLED")){
-            config.setEnvironment(new Environment(null,null,new PooledDataSourceFactory(config).getDataSource()));
-        }else if(config.getDataSourceType().equals("UNPOOLED")){
-            config.setEnvironment(new Environment(null,null,new UnpooledDataSourceFactory(config).getDataSource()));
+        if (config.getDataSourceType().equals("POOLED")) {
+            config.setEnvironment(new Environment(null, null, new PooledDataSourceFactory(config).getDataSource()));
+        } else if (config.getDataSourceType().equals("UNPOOLED")) {
+            config.setEnvironment(new Environment(null, null, new UnpooledDataSourceFactory(config).getDataSource()));
         }
         return config;
     }
 
     /**
      * 注解配置 根据传入的全限定类名封装mapper(sql,resultType)
+     *
      * @param classPath
      * @return
      */
-    private static Map<String,Mapper> loadMapperAnnotation(String classPath) {
-        Map<String,Mapper> mappers = new HashMap<String, Mapper>();
+    private static Map<String, Mapper> loadMapperAnnotation(String classPath) {
+        Map<String, Mapper> mappers = new HashMap<String, Mapper>();
         Mapper mapper = new Mapper();
         try {
             Class daoClass = Class.forName(classPath);
             Method[] methods = daoClass.getMethods();
-            for (Method method:methods) {
-                if(method.isAnnotationPresent(Select.class)){
+            for (Method method : methods) {
+                if (method.isAnnotationPresent(Select.class)) {
                     Select selectAnnotation = method.getAnnotation(Select.class);
                     String sql = selectAnnotation.value();
                     mapper.setSql(sql);
                     String methodName = method.getName();
                     Type type = method.getGenericReturnType();
                     //判断type是不是参数化的类型
-                    if(type instanceof ParameterizedType){
-                        ParameterizedType ptype = (ParameterizedType)type;
+                    if (type instanceof ParameterizedType) {
+                        ParameterizedType ptype = (ParameterizedType) type;
                         Type[] types = ptype.getActualTypeArguments();
-                        Class domainClass = (Class)types[0];
+                        Class domainClass = (Class) types[0];
                         //获取domainClass的类名
                         String resultType = domainClass.getName();
                         mapper.setResultType(resultType);
                     }
-                    String key = classPath+"."+methodName;
-                    mappers.put(key,mapper);
+                    String key = classPath + "." + methodName;
+                    mappers.put(key, mapper);
                 }
             }
 
@@ -136,14 +137,15 @@ public class XMLConfigBuilder {
 
     /**
      * xml配置 根据传入的全限定类名封装mapper(sql,resultType)
+     *
      * @param xmlPath
      * @return
      */
-    private static Map<String,Mapper> loadMapperXMLConfiguration(String xmlPath) {
-        Map<String,Mapper> mappers = new HashMap<String, Mapper>();
+    private static Map<String, Mapper> loadMapperXMLConfiguration(String xmlPath) {
+        Map<String, Mapper> mappers = new HashMap<String, Mapper>();
         InputStream in = null;
         try {
-            in  = Resources.getResourceAsStream(xmlPath);
+            in = Resources.getResourceAsStream(xmlPath);
             SAXReader saxReader = new SAXReader();
             Document document = saxReader.read(in);
             Element root = document.getRootElement();
@@ -157,13 +159,13 @@ public class XMLConfigBuilder {
             selectNodes.addAll(deleteNodes);
 
             Iterator iterator = selectNodes.iterator();
-            while(iterator.hasNext()){
+            while (iterator.hasNext()) {
                 Element element = (Element) iterator.next();
                 String id = element.attributeValue("id");
                 String resultType = element.attributeValue("resultType");
                 String parameterType = element.attributeValue("parameterType");
                 String resultMap = element.attributeValue("resultMap");
-                String key = namespace+"."+id;
+                String key = namespace + "." + id;
 //                if(element.selectNodes("//*").size()>0){
 //                    List n = element.selectNodes("//*");
 //                    System.out.println("ok");
@@ -172,7 +174,7 @@ public class XMLConfigBuilder {
 //                }
 
                 String sql = element.getText();
-                System.out.println("sql="+sql);
+                System.out.println("sql=" + sql);
 //                SqlParser sqlParser = new SqlParser();
 //                Map<String, Object> hashMap = new HashMap();
 //                hashMap.put("sex", "男");
@@ -180,7 +182,7 @@ public class XMLConfigBuilder {
 //                StringBuilder sb = new StringBuilder();
 //                sqlParser.parserElement(element,currParams,hashMap,sb);
 //                System.out.println(sb.toString());
-                Mapper mapper=new Mapper(sql,element,resultType,parameterType,resultMap);
+                Mapper mapper = new Mapper(sql, element, resultType, parameterType, resultMap);
                 mappers.put(key, mapper);
             }
             in.close();

@@ -5,15 +5,6 @@ package com.baiye.www.mybaits.builder.xml;
  * @version 1.0
  * @date 2021/8/31 15:57
  */
-import java.io.StringReader;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.baiye.www.mybaits.builder.node.Attrs;
 import com.baiye.www.mybaits.builder.node.BaseNode;
@@ -26,28 +17,33 @@ import org.dom4j.Node;
 import org.dom4j.Text;
 import org.dom4j.io.SAXReader;
 
+import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class SqlParser {
 
-    private Map<String,Object> currParams = new HashMap<String,Object>();
+    private Map<String, Object> currParams = new HashMap<String, Object>();
 
     /**
-     delete from pl_pagewidget
-     <if test="widgetcodes != null">
-     where pagewidgetcode in
-     <foreach collection="widgetcodes" item="item" index="index" open="(" separator="," close=")">
-     <if test="index == 0">
-     #{item}
-     </if>
-     <foreach collection="bs" item="b" index="index1" open="(" separator="," close=")">
-     #{b}
-     </foreach>
-     </foreach>
-     </if>
-     <if test="a != null">
-     and a = #{a}
-     </if>
+     * delete from pl_pagewidget
+     * <if test="widgetcodes != null">
+     * where pagewidgetcode in
+     * <foreach collection="widgetcodes" item="item" index="index" open="(" separator="," close=")">
+     * <if test="index == 0">
+     * #{item}
+     * </if>
+     * <foreach collection="bs" item="b" index="index1" open="(" separator="," close=")">
+     * #{b}
+     * </foreach>
+     * </foreach>
+     * </if>
+     * <if test="a != null">
+     * and a = #{a}
+     * </if>
      */
     public static void main(String[] args) throws Exception {
 
@@ -58,17 +54,17 @@ public class SqlParser {
         SqlParser parser = new SqlParser();
         System.out
                 .println(parser.parser("delete from pl_pagewidget\n"
-                        + "\t<if test=\"widgetcodes != null\">\n"
-                        + "\t\twhere pagewidgetcode in\n"
-                        + "\t\t<foreach collection=\"widgetcodes\" item=\"item\" index=\"index\" open=\"(\" separator=\",\" close=\")\">\n"
-                        + "\t\t  <if test=\"index == 0\">\n"
-                        + "\t\t  #{item}\n"
-                        + "\t\t  </if>\n"
-                        + "\t\t  <foreach collection=\"bs\" item=\"b\" index=\"index1\" open=\"(\" separator=\",\" close=\")\">\n"
-                        + "\t\t\t#{b}\n" + "\t\t  </foreach>\n"
-                        + "\t\t</foreach>\n" + "\t</if>\n"
-                        + "\t<if test=\"a != null\">\n"
-                        + "\t\tand a = #{a}\n" + "\t</if>\n"
+                                + "\t<if test=\"widgetcodes != null\">\n"
+                                + "\t\twhere pagewidgetcode in\n"
+                                + "\t\t<foreach collection=\"widgetcodes\" item=\"item\" index=\"index\" open=\"(\" separator=\",\" close=\")\">\n"
+                                + "\t\t  <if test=\"index == 0\">\n"
+                                + "\t\t  #{item}\n"
+                                + "\t\t  </if>\n"
+                                + "\t\t  <foreach collection=\"bs\" item=\"b\" index=\"index1\" open=\"(\" separator=\",\" close=\")\">\n"
+                                + "\t\t\t#{b}\n" + "\t\t  </foreach>\n"
+                                + "\t\t</foreach>\n" + "\t</if>\n"
+                                + "\t<if test=\"a != null\">\n"
+                                + "\t\tand a = #{a}\n" + "\t</if>\n"
                         , map));
         System.out.println(parser.getParams());
 
@@ -78,7 +74,7 @@ public class SqlParser {
             throws Exception {
         // xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+xml;
         //给输入的动态sql套一层xml标签
-        xml = "<sql>"+xml+"</sql>";
+        xml = "<sql>" + xml + "</sql>";
         SAXReader reader = new SAXReader(false);
         Document document = reader.read(new StringReader(xml));
         Element element = document.getRootElement();
@@ -91,14 +87,15 @@ public class SqlParser {
 
     /**
      * 使用递归解析动态sql
-     * @param ele1 待解析的xml标签
+     *
+     * @param ele1         待解析的xml标签
      * @param currParams
      * @param globalParams
      * @param sb
      * @throws Exception
      */
     public void parserElement(Element ele1, Map<String, Object> currParams,
-                               Map<String, Object> globalParams, StringBuilder sb)
+                              Map<String, Object> globalParams, StringBuilder sb)
             throws Exception {
         // 解析一个节点，比如解析到了一个if节点，假如test判断为true这里就返回true
         TempVal val = parserOneElement(currParams, globalParams, ele1, sb);
@@ -127,14 +124,14 @@ public class SqlParser {
              */
             params.putAll(currParams);
             //循环所有子节点
-            for (int i = 0; i < nodes.size();) {
+            for (int i = 0; i < nodes.size(); ) {
                 Node n = nodes.get(i);
                 //如果节点是普通文本
                 if (n instanceof Text) {
                     String text = ((Text) n).getStringValue();
                     if (StringUtils.isNotEmpty(text.trim())) {
                         //处理一下文本，如处理#{xx},直接替换${yy}为真实传入的值
-                        sb.append(handText(text, params,globalParams));
+                        sb.append(handText(text, params, globalParams));
                     }
                     i++;
                 } else if (n instanceof Element) {
@@ -165,17 +162,18 @@ public class SqlParser {
 
     /**
      * 处理文本替换掉#{item}这种参数
+     *
      * @param str
      * @param params
      * @return
      * @throws Exception
      */
-    private String handText(String str, Map<String, Object> params,Map<String, Object> globalParams)
+    private String handText(String str, Map<String, Object> params, Map<String, Object> globalParams)
             throws Exception {
         //获取foreach这种标签中用于记录循环的变量
         String indexStr = MapUtils.getString(params, Attrs.WHILE_INDEX);
         Integer index = null;
-        if(StringUtils.isNotEmpty(indexStr)) {
+        if (StringUtils.isNotEmpty(indexStr)) {
             index = MapUtils.getInteger(params, indexStr);
         }
         //匹配#{a}这种参数
@@ -187,20 +185,20 @@ public class SqlParser {
         Pattern p2 = Pattern.compile(reg2);
         Matcher m2 = p2.matcher(str);
         String whileList = MapUtils.getString(params, Attrs.WHILE_LIST);
-        Map<String,Object> allParams = getAllParams(params, globalParams);
-        while(m1.find()) {
+        Map<String, Object> allParams = getAllParams(params, globalParams);
+        while (m1.find()) {
             String tmpKey = m1.group(2);
-            String key = whileList == null?tmpKey:(whileList+"_"+tmpKey);
-            key = index == null?key:(key+index);
-            String reKey = "#{"+key+"}";
+            String key = whileList == null ? tmpKey : (whileList + "_" + tmpKey);
+            key = index == null ? key : (key + index);
+            String reKey = "#{" + key + "}";
             //如果在foreach类似的循环里，可能需要将参数#{xx}替换成#{xx_0},#{xx_1}
             str = str.replace(m1.group(0), reKey);
             currParams.put(key, allParams.get(tmpKey));
         }
-        while(m2.find()) {
+        while (m2.find()) {
             String tmpKey = m2.group(2);
             Object value = allParams.get(tmpKey);
-            if(value != null) {
+            if (value != null) {
                 str = str.replace(m2.group(0), getValue(value));
             }
         }
@@ -209,9 +207,9 @@ public class SqlParser {
 
     private String getValue(Object value) {
         String result = "";
-        if(value instanceof Date) {
+        if (value instanceof Date) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            result = sdf.format((Date)value);
+            result = sdf.format((Date) value);
         } else {
             result = String.valueOf(value);
         }
@@ -220,7 +218,7 @@ public class SqlParser {
 
     private Map<String, Object> getAllParams(Map<String, Object> currParams,
                                              Map<String, Object> globalParams) {
-        Map<String,Object> allParams = new HashMap<String,Object>();
+        Map<String, Object> allParams = new HashMap<String, Object>();
         allParams.putAll(globalParams);
         allParams.putAll(currParams);
         return allParams;
@@ -252,6 +250,7 @@ public class SqlParser {
 
     /**
      * 封装一个xml元素被解析后的结果
+     *
      * @author rongdi
      */
     final static class TempVal {
