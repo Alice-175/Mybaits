@@ -5,8 +5,9 @@ import com.baiye.www.mybaits.builder.xml.XMlSqlBuilder;
 import com.baiye.www.mybaits.cache.PerpetualCache;
 import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.confiuration.Mapper;
-import com.baiye.www.mybaits.datasource.unpooled.UnpooledDataSourceFactory;
 import com.baiye.www.mybaits.io.Resources;
+import com.baiye.www.mybaits.transaction.Transaction;
+import com.baiye.www.mybaits.transaction.jdbc.JdbcTransactionFactory;
 import com.baiye.www.utils.SqlUtil;
 import com.baiye.www.utils.StringUtil;
 import com.baiye.www.mybaits.builder.xml.XMLConfigBuilder;
@@ -31,9 +32,10 @@ import java.util.List;
  * @Description:
  */
 public class SimpleExecutor implements Executor{
-
+    protected Transaction transaction;
     private boolean closed;
     protected PerpetualCache localCache =new PerpetualCache();
+    private boolean autoCommit;
 
     Logger logger = LoggerFactory.getLogger(SqlUtil.class);
 
@@ -41,40 +43,36 @@ public class SimpleExecutor implements Executor{
     private Connection conn;
 
 
-    public SimpleExecutor(){
-        this("SqlMapConfig.xml");
-    }
-    public SimpleExecutor(String resourceName) {
-        InputStream in = null;
-        try {
-            in = Resources.getResourceAsStream(resourceName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        configuration = XMLConfigBuilder.loadConfiguration(in);
-        try{
-            if("UNPOOLED".equals(configuration.getDataSourceType())){
-                UnpooledDataSourceFactory unpooledDataSourceFactory = new UnpooledDataSourceFactory(configuration);
-                conn = unpooledDataSourceFactory.getDataSource().getConnection();
-                // conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
-            }else if("POOLED".equals(configuration.getDataSourceType())) {
-                conn = configuration.getEnvironment().getDataSource().getConnection();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-    public SimpleExecutor(Configuration configuration) {
+//    public SimpleExecutor(Configuration configuration,,boolean autoCommit){
+//        this("SqlMapConfig.xml",autoCommit);
+//        this.configuration = configuration;
+//    }
+//    public SimpleExecutor(String resourceName,boolean autoCommit) {
+//        this.autoCommit=autoCommit;
+//        InputStream in = null;
+//        try {
+//            in = Resources.getResourceAsStream(resourceName);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        configuration = XMLConfigBuilder.loadConfiguration(in);
+//        this.transaction=new JdbcTransactionFactory().newTransaction(configuration.getEnvironment().getDataSource(),autoCommit);
+//        try {
+//            this.conn=this.transaction.getConnection();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//public SimpleExecutor(Configuration configuration, Transaction transaction) {
+//    super(configuration, transaction);
+//}
+    public SimpleExecutor(Configuration configuration,boolean autoCommit) {
         this.configuration = configuration;
-        try{
-            if("UNPOOLED".equals(configuration.getDataSourceType())){
-                UnpooledDataSourceFactory unpooledDataSourceFactory = new UnpooledDataSourceFactory(configuration);
-                conn = unpooledDataSourceFactory.getDataSource().getConnection();
-                // conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
-            }else if("POOLED".equals(configuration.getDataSourceType())) {
-                conn = configuration.getEnvironment().getDataSource().getConnection();
-            }
-        }catch (Exception e){
+        this.autoCommit=autoCommit;
+        this.transaction=new JdbcTransactionFactory().newTransaction(configuration.getEnvironment().getDataSource(),autoCommit);
+        try {
+            this.conn=this.transaction.getConnection();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -141,10 +139,7 @@ public class SimpleExecutor implements Executor{
         return query(mapper,object);
     }
 
-    @Override
-    public void close() {
-        localCache.clear();
-    }
+
 
     @Override
     public int update(Mapper mapper, Object[] object) {
@@ -162,8 +157,6 @@ public class SimpleExecutor implements Executor{
         try {
             resultSql = SqlUtil.paramToSql(originalSql,object);
             logger.info("resultSql = "+resultSql);
-
-            //conn = DriverManager.getConnection(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
             preparedStatement = conn.prepareStatement(resultSql);
             return preparedStatement.executeUpdate();
         } catch (SQLException | IntrospectionException | IllegalAccessException | InvocationTargetException e) {
@@ -181,7 +174,10 @@ public class SimpleExecutor implements Executor{
     private void release(Connection con,PreparedStatement pstm,ResultSet rs){
         if(con != null){
             try {
-                con.close();
+                if(transaction.isAutoCommit()){
+                    transaction.close();
+                }
+
             }catch(Exception e){
                 throw new MybatisException("资源释放异常",e);
             }
@@ -203,13 +199,38 @@ public class SimpleExecutor implements Executor{
         }
     }
     @Override
+    public void close() {
+        localCache.clear();
+        try {
+            transaction.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    @Override
     public void clearLocalCache() {
         if (!closed) {
             localCache.clear();
         }
     }
 
+    @Override
+    public void rollback() {
+        try {
+            transaction.rollback();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @Override
+    public void commit() {
+        try {
+            transaction.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

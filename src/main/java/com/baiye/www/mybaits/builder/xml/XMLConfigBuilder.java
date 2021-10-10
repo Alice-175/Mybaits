@@ -4,6 +4,7 @@ import com.baiye.www.mybaits.annotation.Select;
 import com.baiye.www.mybaits.confiuration.Configuration;
 import com.baiye.www.mybaits.confiuration.Mapper;
 import com.baiye.www.mybaits.datasource.pooled.PooledDataSourceFactory;
+import com.baiye.www.mybaits.datasource.unpooled.UnpooledDataSourceFactory;
 import com.baiye.www.mybaits.io.Resources;
 import com.baiye.www.mybaits.mapping.Environment;
 import com.sun.jndi.ldap.pool.PooledConnectionFactory;
@@ -88,6 +89,8 @@ public class XMLConfigBuilder {
 
         if(config.getDataSourceType().equals("POOLED")){
             config.setEnvironment(new Environment(null,null,new PooledDataSourceFactory(config).getDataSource()));
+        }else if(config.getDataSourceType().equals("UNPOOLED")){
+            config.setEnvironment(new Environment(null,null,new UnpooledDataSourceFactory(config).getDataSource()));
         }
         return config;
     }

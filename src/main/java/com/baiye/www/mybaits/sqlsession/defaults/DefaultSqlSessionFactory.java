@@ -19,6 +19,10 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
 
     @Override
     public SqlSession openSession() {
-        return new DefaultSqlSession(configuration);
+        return new DefaultSqlSession(configuration, false);
+    }
+    @Override
+    public SqlSession openSession(boolean autoCommit) {
+        return new DefaultSqlSession(configuration, autoCommit);
     }
 }

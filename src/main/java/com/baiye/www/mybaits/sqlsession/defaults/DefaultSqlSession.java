@@ -1,18 +1,12 @@
 package com.baiye.www.mybaits.sqlsession.defaults;
 
 import com.baiye.www.mybaits.confiuration.Configuration;
-import com.baiye.www.mybaits.confiuration.Mapper;
-import com.baiye.www.mybaits.datasource.DataSourceFactory;
-import com.baiye.www.mybaits.datasource.unpooled.UnpooledDataSource;
-import com.baiye.www.mybaits.datasource.unpooled.UnpooledDataSourceFactory;
 import com.baiye.www.mybaits.executor.Executor;
 import com.baiye.www.mybaits.executor.SimpleExecutor;
 import com.baiye.www.mybaits.proxy.MapperProxy;
 import com.baiye.www.mybaits.sqlsession.SqlSession;
-import com.baiye.www.utils.ConnectionUtil;
 
 import java.lang.reflect.Proxy;
-import java.sql.Connection;
 import java.util.List;
 
 /**
@@ -25,10 +19,13 @@ import java.util.List;
 public class DefaultSqlSession implements SqlSession {
     protected Configuration configuration;
     private Executor executor;
+    private final boolean autoCommit;
+    private boolean dirty;
 
-    public DefaultSqlSession(Configuration configuration) {
+    public DefaultSqlSession(Configuration configuration, boolean autoCommit) {
         this.configuration = configuration;
-        executor = new SimpleExecutor(configuration);
+        executor = new SimpleExecutor(configuration,autoCommit);
+        this.autoCommit = autoCommit;
     }
 
     public Configuration getConfiguration() {
@@ -67,23 +64,40 @@ public class DefaultSqlSession implements SqlSession {
 
     @Override
     public int insert(String mapperName, Object[] parameter) {
+        dirty=true;
         return executor.update(configuration.getMappers().get(mapperName),parameter);
     }
 
     @Override
     public int update(String mapperName, Object[] parameter) {
+        dirty=true;
         return executor.update(configuration.getMappers().get(mapperName),parameter);
     }
 
     @Override
     public int delete(String mapperName, Object[] parameter) {
+        dirty=true;
         return executor.update(configuration.getMappers().get(mapperName),parameter);
     }
 
     @Override
     public void close() {
+        if(!autoCommit&&dirty){
+            rollback();
+        }
         executor.close();
     }
+
+    @Override
+    public void rollback() {
+        executor.rollback();
+    }
+
+    @Override
+    public void commit() {
+        executor.commit();
+    }
+
     @Override
     public void clearCache() {
         executor.clearLocalCache();

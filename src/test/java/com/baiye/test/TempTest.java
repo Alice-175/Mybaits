@@ -17,16 +17,16 @@ import java.util.List;
  */
 public class TempTest {
     public static void main(String[] args) throws IOException {
-        InputStream in = Resources.getResourceAsStream("SqlMapConfig.xml");
-        Configuration configuration = XMLConfigBuilder.loadConfiguration(in);
-        SimpleExecutor simpleExecutor = new SimpleExecutor(configuration);
-        Object[] o = new Object[1];
-        o[0]=41;
-        //sqlXML里的方法名
-        String name = "com.baiye.www.dao.IUserDao.findById";
-        Mapper mapper = configuration.getMappers().get(name);
-        List<Object> u = simpleExecutor.query(mapper, o);
-        System.out.println(u.toString());
+//        InputStream in = Resources.getResourceAsStream("SqlMapConfig.xml");
+//        Configuration configuration = XMLConfigBuilder.loadConfiguration(in);
+//        SimpleExecutor simpleExecutor = new SimpleExecutor(configuration);
+//        Object[] o = new Object[1];
+//        o[0]=41;
+//        //sqlXML里的方法名
+//        String name = "com.baiye.www.dao.IUserDao.findById";
+//        Mapper mapper = configuration.getMappers().get(name);
+//        List<Object> u = simpleExecutor.query(mapper, o);
+//        System.out.println(u.toString());
     }
 
 }

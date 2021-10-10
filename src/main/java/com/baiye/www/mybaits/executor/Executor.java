@@ -19,4 +19,8 @@ public interface Executor {
     int update(Mapper mapper, Object[] parameter);
 
     void clearLocalCache();
+
+    void rollback();
+
+    void commit();
 }
